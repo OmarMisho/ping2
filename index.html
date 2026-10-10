@@ -1,20 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="light" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="SafeReach - Emergency Contact System. Scan QR code to reach someone in case of emergency." />
-    <meta name="theme-color" content="#dc2626" />
+    <meta name="description" content="Founder — one personal QR that lets a finder reach you privately, with no name or phone number shown." />
+    <meta name="theme-color" content="#f7d94c" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>SafeReach - Emergency Contact System</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>Founder — Private found-item chat</title>
     <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f7d94c'/><path d='M10 11V9h3M19 9h3v2M22 21v2h-3M13 23h-3v-2M11 16h10' fill='none' stroke='%2320231e' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <style>
-      /* 内联样式确保主题色立即生效，避免闪烁 */
+      /* Inline styles so the theme colour applies immediately (no flash). */
       html,
       body {
         margin: 0;
@@ -25,7 +30,7 @@
       html.light,
       html.light body {
         background-color: #ffffff !important;
-        color: #000000;
+        color: #20231e;
       }
       html.dark,
       html.dark body {
@@ -34,7 +39,7 @@
       }
     </style>
     <script>
-      // 在 React 加载前立即设置主题，避免闪烁
+      // Apply the theme before React loads to avoid a flash.
       (function () {
         const isInIframe = window.self !== window.top;
 
@@ -45,7 +50,7 @@
         }
 
         if (isInIframe) {
-          // 监听父窗口主动推送的主题消息
+          // Listen for a theme pushed by the parent window.
           window.addEventListener("message", function (event) {
             if (event.data && typeof event.data.theme === "string") {
               const theme = event.data.theme;
@@ -55,21 +60,21 @@
             }
           });
         } else {
-          // 非 iframe 环境，使用默认 light 主题
+          // Outside an iframe the Founder design defaults to light.
           applyThemeToDOM("light");
         }
       })();
     </script>
-      <script>
+    <script>
       (function () {
         if (window.self === window.top) return;
         var reported = {};
         window.addEventListener("error", function (event) {
-          // 资源加载失败的 error 事件没有 message，此处仅上报 JS 运行时错误
+          // Resource-load failures have no message; only report JS runtime errors.
           if (!event || !event.message) return;
           var key =
             event.message + "|" + (event.filename || "") + "|" + (event.lineno || 0);
-          if (reported[key]) return; // 相同错误只上报一次，避免渲染循环刷屏
+          if (reported[key]) return;
           reported[key] = true;
           try {
             window.parent.postMessage(
@@ -89,7 +94,7 @@
               "*"
             );
           } catch (e) {
-            /* 上报失败不影响页面运行 */
+            /* reporting failure must not affect the page */
           }
         });
       })();

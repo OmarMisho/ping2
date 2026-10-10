@@ -7,6 +7,8 @@ import {
   deleteChat,
 } from '../services/firebaseService';
 import OwnerChatView from './OwnerChatView';
+import { MessageSquare, Trash2 } from 'lucide-react';
+import { STROKE } from '../components/FounderUI';
 
 const OwnerChats: React.FC = () => {
   const [chats, setChats] = useState<ChatSession[]>([]);
@@ -74,59 +76,85 @@ const OwnerChats: React.FC = () => {
     );
   }
 
+  const unreadCount = chats.filter((c) => c.unread).length;
+
   return (
-    <div className="flex-1 flex flex-col">
-      <div className="bg-white border-b px-6 py-4">
-        <h1 className="text-2xl font-bold text-gray-800">Received Chats</h1>
-        <p className="text-gray-500 text-sm mt-1">
-          {chats.length} conversation{chats.length !== 1 ? 's' : ''}
-          {chats.filter((c) => c.unread).length > 0 && (
-            <span className="ml-2 text-red-600 font-medium">
-              ({chats.filter((c) => c.unread).length} unread)
-            </span>
+    <div className="flex-1 flex flex-col min-h-0">
+      {/* Header */}
+      <div className="shrink-0 bg-white border-b border-line px-6 md:px-10 py-5">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-[20px] font-bold leading-6 text-ink">Inbox</h1>
+            {unreadCount > 0 && (
+              <span className="rounded-full bg-accent px-2 py-[2px] text-[10px] font-bold leading-[14px] text-ink">
+                {unreadCount} new
+              </span>
+            )}
+          </div>
+          <p className="text-[12px] leading-[16px] text-muted mt-0.5">
+            {chats.length} conversation{chats.length !== 1 ? 's' : ''} · when a
+            finder starts a chat through your QR code, it appears here
+          </p>
+          {error && (
+            <p className="text-[12px] leading-4 text-amber mt-2">{error}</p>
           )}
-        </p>
-        {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
+        </div>
       </div>
 
+      {/* List */}
       <div className="flex-1 overflow-y-auto">
         {chats.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
+            <div className="w-16 h-16 rounded-card bg-accent-soft flex items-center justify-center mb-4">
+              <MessageSquare size={28} strokeWidth={STROKE} className="text-ink" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-600">No conversations yet</h3>
-            <p className="text-gray-400 mt-2 text-sm">
-              When someone starts a chat through your QR code, it will appear here.
+            <h3 className="text-[17px] font-semibold leading-6 text-ink">
+              No conversations yet
+            </h3>
+            <p className="text-[13px] leading-5 text-body mt-1.5 max-w-[260px]">
+              When someone starts a chat through your QR code, it will appear
+              here.
             </p>
           </div>
         ) : (
-          <div className="divide-y">
+          <div className="mx-auto max-w-3xl w-full px-6 md:px-10 py-4 flex flex-col gap-2.5">
             {chats.map((chat) => (
               <div
                 key={chat.id}
-                className={`px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors ${chat.unread ? 'bg-red-50/50' : ''}`}
                 onClick={() => {
                   setSelectedChat(chat);
                   if (chat.unread) void handleMarkRead(chat.id);
                 }}
+                className={`rounded-card border transition-colors cursor-pointer ${
+                  chat.unread
+                    ? 'border-accent bg-accent-soft/60'
+                    : 'border-line bg-white hover:bg-surface'
+                }`}
               >
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${chat.unread ? 'bg-red-500' : 'bg-gray-400'}`}>
+                <div className="flex items-center gap-3.5 p-[14px]">
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center text-[17px] font-bold shrink-0 ${
+                      chat.unread ? 'bg-accent text-ink' : 'bg-surface text-body'
+                    }`}
+                  >
                     {chat.userName.charAt(0).toUpperCase()}
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">
-                        <h3 className={`font-semibold truncate ${chat.unread ? 'text-gray-900' : 'text-gray-700'}`}>
+                        <h3
+                          className={`text-[15px] font-semibold leading-[21px] truncate ${
+                            chat.unread ? 'text-ink' : 'text-body'
+                          }`}
+                        >
                           {chat.userName}
                         </h3>
-                        <p className="text-xs text-red-600 truncate">{chat.qrName}</p>
+                        <p className="text-[11px] font-medium leading-[14px] text-amber truncate">
+                          {chat.qrName}
+                        </p>
                       </div>
-                      <span className="text-xs text-gray-400 flex-shrink-0">
+                      <span className="text-[11px] font-medium leading-[14px] text-muted flex-shrink-0">
                         {new Date(chat.lastUpdated).toLocaleDateString([], {
                           month: 'short',
                           day: 'numeric',
@@ -134,24 +162,30 @@ const OwnerChats: React.FC = () => {
                       </span>
                     </div>
 
-                    <p className={`text-sm truncate mt-1 ${chat.unread ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
+                    <p
+                      className={`text-[13px] truncate mt-1 ${
+                        chat.unread
+                          ? 'text-ink font-medium'
+                          : 'text-muted'
+                      }`}
+                    >
                       {chat.lastMessage || 'No messages yet'}
                     </p>
                   </div>
 
-                  {chat.unread && <div className="w-3 h-3 bg-red-500 rounded-full flex-shrink-0" />}
+                  {chat.unread && (
+                    <span className="w-[9px] h-[9px] bg-accent rounded-full flex-shrink-0" />
+                  )}
 
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       void handleDeleteChat(chat.id);
                     }}
-                    className="p-2 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
+                    className="p-2 text-muted hover:text-amber transition-colors flex-shrink-0"
                     title="Delete chat"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4v-1a1 1 0 00-1-1h-4a1 1 0 00-1 1v1H4v2h16V4z" />
-                    </svg>
+                    <Trash2 size={18} strokeWidth={STROKE} />
                   </button>
                 </div>
               </div>

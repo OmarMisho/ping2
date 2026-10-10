@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChatSession, Message } from '../types';
 import { listenToMessages, sendMessageAsOwner } from '../services/firebaseService';
+import { AppHeader, MessageBubble, Composer } from '../components/FounderUI';
 
 interface OwnerChatViewProps {
   chat: ChatSession;
@@ -59,70 +60,62 @@ const OwnerChatView: React.FC<OwnerChatViewProps> = ({ chat, onBack, onRefresh }
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full">
-      <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
-        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full transition-colors" title="Back">
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
+    <div className="flex-1 flex flex-col h-full min-h-0">
+      {/* Header */}
+      <AppHeader
+        onBack={onBack}
+        title={chat.userName}
+        subtitle={chat.qrName}
+        right={
+          <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-[16px] font-bold text-ink shrink-0">
+            {chat.userName.charAt(0).toUpperCase()}
+          </div>
+        }
+      />
 
-        <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white font-bold">
-          {chat.userName.charAt(0).toUpperCase()}
-        </div>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto bg-surface">
+        <div className="max-w-2xl mx-auto px-6 py-5 flex flex-col gap-3.5">
+          {messages.length === 0 && (
+            <p className="text-[12px] leading-4 text-muted text-center py-6">
+              No messages yet in this chat.
+            </p>
+          )}
 
-        <div className="flex-1 min-w-0">
-          <h2 className="font-semibold text-gray-800 truncate">{chat.userName}</h2>
-          <p className="text-xs text-red-600 truncate">{chat.qrName}</p>
-        </div>
-      </div>
+          {messages.map((msg) => {
+            const mine = msg.sender === 'owner';
+            return (
+              <MessageBubble
+                key={msg.id}
+                side={mine ? 'me' : 'them'}
+                text={msg.text}
+                time={new Date(msg.timestamp).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+                meta={mine ? 'You' : chat.userName}
+              />
+            );
+          })}
 
-      <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-        <div className="max-w-2xl mx-auto space-y-3">
-          {messages.map((msg) => (
-            <div key={msg.id} className={`flex ${msg.sender === 'owner' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] px-4 py-2 rounded-2xl ${msg.sender === 'owner' ? 'bg-red-600 text-white rounded-br-md' : 'bg-white text-gray-800 shadow-sm rounded-bl-md'}`}>
-                <p className="text-sm leading-relaxed">{msg.text}</p>
-                <p className={`text-xs mt-1 ${msg.sender === 'owner' ? 'text-red-200' : 'text-gray-400'}`}>
-                  {new Date(msg.timestamp).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
-              </div>
-            </div>
-          ))}
           <div ref={messagesEndRef} />
         </div>
       </div>
 
-      {error && <div className="px-4 pb-2 text-center text-sm text-red-600">{error}</div>}
-
-      <div className="bg-white border-t px-4 py-3">
-        <div className="max-w-2xl mx-auto flex items-center gap-2">
-          <input
-            type="text"
+      {/* Reply controls */}
+      <div className="shrink-0 bg-white border-t border-line px-6 py-4">
+        <div className="max-w-2xl mx-auto">
+          {error && (
+            <p className="text-[12px] leading-4 text-amber mb-3">{error}</p>
+          )}
+          <Composer
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={setInput}
+            onSend={() => void handleSend()}
             onKeyDown={handleKeyPress}
-            placeholder="Type your reply..."
-            disabled={sending}
-            className="flex-1 px-4 py-3 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 text-sm disabled:opacity-60"
+            placeholder="Type your reply…"
+            sending={sending}
           />
-          <button
-            onClick={() => void handleSend()}
-            disabled={!input.trim() || sending}
-            className="w-11 h-11 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors disabled:opacity-50"
-            title="Send"
-          >
-            {sending ? (
-              <span className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            )}
-          </button>
         </div>
       </div>
     </div>

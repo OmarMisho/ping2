@@ -1,5 +1,15 @@
 import { useState } from 'react';
 import { loginOwner, registerOwner } from '../firebase';
+import {
+  AppShell,
+  AppHeader,
+  PrimaryButton,
+  TextButton,
+  PrivacyNote,
+  Spinner,
+  STROKE,
+} from '../components/FounderUI';
+import { LogIn, UserPlus, ShieldCheck } from 'lucide-react';
 
 export default function OwnerLoginPage() {
   const [email, setEmail] = useState('');
@@ -51,104 +61,99 @@ export default function OwnerLoginPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        background: '#f5f7fa',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 400,
-          background: 'white',
-          padding: 30,
-          borderRadius: 16,
-          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-        }}
-      >
-        <h1>SafeReach</h1>
+    <AppShell>
+      <AppHeader brand />
 
-        <h2>
-          {isRegistering ? 'Create Owner Account' : 'Owner Login'}
-        </h2>
+      <div className="flex-1 flex flex-col justify-center px-6 pb-10">
+        <div className="flex flex-col gap-2.5 mb-7">
+          <p className="text-[12px] font-bold leading-[17px] text-amber">
+            OWNER ACCESS
+          </p>
+          <h1 className="text-[26px] font-bold leading-8 text-ink">
+            {isRegistering ? 'Create owner account' : 'Owner login'}
+          </h1>
+          <p className="text-[15px] font-normal leading-[22px] text-body">
+            {isRegistering
+              ? 'Manage your Founder QR code and reply to finder chats whenever you’re scanned.'
+              : 'Welcome back. Sign in to see your finder chats.'}
+          </p>
+        </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{
-            width: '100%',
-            padding: 12,
-            marginBottom: 12,
-            boxSizing: 'border-box',
-          }}
-        />
+        <div className="flex flex-col gap-3.5">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[12px] font-semibold leading-4 text-body">
+              Email
+            </span>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full h-[54px] rounded-control bg-surface px-3.5 text-[14px] font-normal leading-5 text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+            />
+          </label>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{
-            width: '100%',
-            padding: 12,
-            marginBottom: 12,
-            boxSizing: 'border-box',
-          }}
-        />
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[12px] font-semibold leading-4 text-body">
+              Password
+            </span>
+            <input
+              type="password"
+              placeholder="At least 6 characters"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full h-[54px] rounded-control bg-surface px-3.5 text-[14px] font-normal leading-5 text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+            />
+          </label>
 
-        {error && (
-          <div
-            style={{
-              color: '#c62828',
-              marginBottom: 12,
+          {error && (
+            <p className="text-[13px] leading-5 text-amber rounded-control bg-accent-soft px-3.5 py-3">
+              {error}
+            </p>
+          )}
+
+          <PrimaryButton
+            onClick={handleSubmit}
+            disabled={loading}
+            icon={
+              loading ? (
+                <Spinner className="border-ink/25 border-t-ink" />
+              ) : isRegistering ? (
+                <UserPlus size={20} strokeWidth={STROKE} />
+              ) : (
+                <LogIn size={20} strokeWidth={STROKE} />
+              )
+            }
+          >
+            {loading
+              ? 'Please wait…'
+              : isRegistering
+                ? 'Create account'
+                : 'Login'}
+          </PrimaryButton>
+
+          <TextButton
+            onClick={() => {
+              setIsRegistering(!isRegistering);
+              setError('');
             }}
           >
-            {error}
-          </div>
-        )}
+            {isRegistering
+              ? 'Already have an account? Login'
+              : 'Create a new owner account'}
+          </TextButton>
+        </div>
 
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          style={{
-            width: '100%',
-            padding: 14,
-            cursor: loading ? 'default' : 'pointer',
-          }}
-        >
-          {loading
-            ? 'Please wait...'
-            : isRegistering
-              ? 'CREATE ACCOUNT'
-              : 'LOGIN'}
-        </button>
-
-        <button
-          onClick={() => {
-            setIsRegistering(!isRegistering);
-            setError('');
-          }}
-          style={{
-            width: '100%',
-            marginTop: 12,
-            padding: 12,
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          {isRegistering
-            ? 'Already have an account? Login'
-            : 'Create a new owner account'}
-        </button>
+        <div className="mt-9">
+          <PrivacyNote
+            tone="yellow"
+            icon={<ShieldCheck size={16} strokeWidth={STROKE} />}
+          >
+            Only the account owner can see this dashboard. Finder chats stay
+            anonymous and private.
+          </PrivacyNote>
+        </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

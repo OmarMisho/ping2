@@ -1,80 +1,127 @@
 import React from 'react';
+import { ScanLine, MessageCircle, User, ShieldCheck } from 'lucide-react';
+import {
+  AppShell,
+  Badge,
+  Brand,
+  STROKE,
+  Card,
+  PrivacyNote,
+} from '../components/FounderUI';
 import { getSettings } from '../storage';
 
+/*
+ * Finder browser · QR arrival (generic landing)
+ * Figma: 2:19097 / 2:19261
+ */
 const PublicPage: React.FC = () => {
   const settings = getSettings();
 
+  const steps = [
+    'Scan the owner’s Founder QR code.',
+    'Start a private text chat.',
+    'The owner is notified instantly.',
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex flex-col items-center justify-center p-6">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-100 rounded-full opacity-50"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-orange-100 rounded-full opacity-50"></div>
-      </div>
+    <AppShell>
+      {/* Header */}
+      <header className="flex items-center justify-between px-6 h-[72px] shrink-0">
+        <Brand nameSize="sm" />
+        <Badge>Private chat</Badge>
+      </header>
 
-      <div className="relative z-10 max-w-md w-full text-center">
-        {/* Logo */}
-        <div className="mb-8">
-          <div className="w-28 h-28 bg-gradient-to-br from-red-500 to-red-700 rounded-3xl shadow-2xl shadow-red-200 flex items-center justify-center mx-auto transform hover:scale-105 transition-transform">
-            <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
+      {/* Content */}
+      <div className="flex-1 flex flex-col px-6 pt-2.5 pb-6">
+        <div className="flex flex-col gap-[22px]">
+          {/* Scan confirmation */}
+          <div className="w-16 h-16 rounded-card bg-accent flex items-center justify-center">
+            <ScanLine size={32} strokeWidth={STROKE} className="text-ink" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mt-6">SafeReach</h1>
-          <p className="text-gray-500 mt-1">Emergency Contact System</p>
-        </div>
 
-        {/* Message Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/50">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
+          {/* Introduction */}
+          <div className="flex flex-col gap-2.5">
+            <p className="text-[12px] font-bold leading-[17px] text-amber">
+              YOU SCANNED A FOUNDER QR
+            </p>
+            <h1 className="text-[28px] font-bold leading-8 text-ink whitespace-pre-line">
+              {'Found something?\nYou’re in the right place.'}
+            </h1>
+            <p className="text-[15px] font-normal leading-[22px] text-body">
+              Send a text to its owner and help their belongings find a way
+              home.
+            </p>
           </div>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">
-            {settings.emergencyMessage}
-          </h2>
-          <p className="text-gray-500 text-sm leading-relaxed">
-            If you need immediate assistance or have an emergency concern, don't hesitate to reach out. I'm here to help.
-          </p>
-        </div>
 
-        {/* How it works */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 mb-8 border border-white/50">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">How it works:</h3>
-          <div className="space-y-2 text-sm text-gray-600">
-            <div className="flex items-start gap-2">
-              <span className="bg-red-100 text-red-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
-              <span>Visit this website</span>
+          {/* Owner's message */}
+          <Card className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <MessageCircle
+                size={23}
+                strokeWidth={STROKE}
+                className="text-ink shrink-0"
+              />
+              <p className="text-[15px] font-semibold leading-[22px] text-ink">
+                {settings.emergencyMessage}
+              </p>
             </div>
-            <div className="flex items-start gap-2">
-              <span className="bg-red-100 text-red-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
-              <span>Start a chat and send your message</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="bg-red-100 text-red-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
-              <span>The owner receives it instantly on their app</span>
+            <p className="text-[12px] font-normal leading-[17px] text-body">
+              If you need to reach the owner, they’ll see your message right away.
+            </p>
+          </Card>
+
+          {/* How it works */}
+          <div className="flex flex-col gap-2.5">
+            <p className="text-[12px] font-semibold leading-[17px] text-muted">
+              HOW IT WORKS
+            </p>
+            <div className="flex flex-col gap-2.5">
+              {steps.map((step, index) => (
+                <div key={step} className="flex items-center gap-2.5">
+                  <span className="w-[22px] h-[22px] rounded-full bg-accent-soft flex items-center justify-center shrink-0 text-[11px] font-bold text-amber">
+                    {index + 1}
+                  </span>
+                  <span className="text-[13px] leading-[19px] text-body">
+                    {step}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
 
-        {/* CTA Button */}
-        <div
-          className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-8 rounded-2xl font-bold text-lg shadow-xl shadow-red-200 hover:shadow-2xl hover:from-red-700 hover:to-red-800 transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-          Scan the owner's SafeReach QR code to start a chat
+          {/* Anonymous identity */}
+          <div className="flex items-start gap-2.5 rounded-control bg-surface p-3.5">
+            <User
+              size={18}
+              strokeWidth={STROKE}
+              className="text-ink mt-0.5 shrink-0"
+            />
+            <p className="text-[12px] font-normal leading-[17px] text-body">
+              No name, phone number, or contact details are shown. Just a private
+              text conversation.
+            </p>
+          </div>
+
+          <PrivacyNote
+            tone="yellow"
+            icon={<ShieldCheck size={16} strokeWidth={STROKE} />}
+          >
+            Your messages are private. The owner’s contact details always stay
+            hidden.
+          </PrivacyNote>
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-gray-400 text-xs">
-          <p>🔒 Your messages are private and secure</p>
-          <p className="mt-1">Powered by SafeReach</p>
+        <div className="mt-8 border-t border-line pt-4 text-center">
+          <p className="text-[11px] leading-4 text-muted">
+            Scan the owner’s Founder QR code to start a chat.
+          </p>
+          <p className="text-[11px] leading-4 text-muted mt-1">
+            Powered by Founder
+          </p>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 };
 

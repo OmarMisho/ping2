@@ -8,6 +8,20 @@ import {
   listenToMessages,
   sendMessageAsUser,
 } from '../services/firebaseService';
+import { MessageCircle, User } from 'lucide-react';
+import {
+  AppShell,
+  AppHeader,
+  Brand,
+  STROKE,
+  PrimaryButton,
+  PrivacyNote,
+  ProgressBar,
+  MessageBubble,
+  Composer,
+  LimitCard,
+  Spinner,
+} from '../components/FounderUI';
 
 const MAX_VISITOR_MESSAGES = 10;
 
@@ -15,15 +29,18 @@ const ErrorScreen: React.FC<{ title: string; message: string }> = ({
   title,
   message,
 }) => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center p-5">
-    <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
-      <div className="w-20 h-20 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
-        <span className="text-4xl">⚠️</span>
+  <AppShell>
+    <AppHeader brand />
+    <div className="flex-1 flex items-center justify-center px-6">
+      <div className="w-full text-center flex flex-col items-center">
+        <div className="w-16 h-16 rounded-card bg-accent-soft flex items-center justify-center mb-5">
+          <MessageCircle size={30} strokeWidth={STROKE} className="text-ink" />
+        </div>
+        <h2 className="text-[20px] font-bold leading-6 text-ink">{title}</h2>
+        <p className="text-[14px] leading-5 text-body mt-2">{message}</p>
       </div>
-      <h2 className="text-xl font-bold text-gray-800">{title}</h2>
-      <p className="text-gray-500 mt-2">{message}</p>
     </div>
-  </div>
+  </AppShell>
 );
 
 const ChatPage: React.FC = () => {
@@ -169,9 +186,15 @@ const ChatPage: React.FC = () => {
 
   if (loadingQr) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
-        <div className="text-gray-500">Verifying emergency QR code...</div>
-      </div>
+      <AppShell>
+        <AppHeader brand />
+        <div className="flex-1 flex flex-col items-center justify-center gap-4">
+          <Spinner className="w-6 h-6" />
+          <p className="text-[14px] leading-5 text-body">
+            Verifying emergency QR code…
+          </p>
+        </div>
+      </AppShell>
     );
   }
 
@@ -197,155 +220,219 @@ const ChatPage: React.FC = () => {
     );
   }
 
+  /* ---------------- Pre-start arrival ---------------- */
   if (!started) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-5">
-        <div className="w-full max-w-md text-center">
-          <div className="flex justify-center mb-8">
-            <div className="relative">
-              <div className="w-28 h-28 bg-red-600 rounded-[2rem] shadow-xl flex items-center justify-center">
-                <svg className="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h8M12 8v8" />
-                </svg>
-              </div>
-              <div className="absolute -bottom-2 -right-2 w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center">
-                <div className="w-5 h-5 bg-green-500 rounded-full" />
+      <AppShell>
+        <header className="flex items-center justify-between px-6 h-[72px] shrink-0">
+          <Brand nameSize="sm" />
+          <span className="inline-flex items-center rounded-full bg-accent-soft px-2.5 py-[5px] text-[11px] font-semibold leading-[13px] text-amber">
+            Private chat
+          </span>
+        </header>
+
+        <div className="flex-1 flex flex-col justify-between px-6 pt-2.5 pb-6">
+          <div className="flex flex-col gap-[22px]">
+            <div className="w-16 h-16 rounded-card bg-accent flex items-center justify-center">
+              <QrIcon />
+            </div>
+
+            <div className="flex flex-col gap-2.5">
+              <p className="text-[12px] font-bold leading-[17px] text-amber">
+                YOU SCANNED A FOUNDER QR
+              </p>
+              <h1 className="text-[28px] font-bold leading-8 text-ink">
+                {qr.headline}
+              </h1>
+              <div className="flex items-center gap-2.5 mt-1">
+                <User size={20} strokeWidth={STROKE} className="text-ink shrink-0" />
+                <span className="text-[15px] font-semibold leading-[22px] text-ink truncate">
+                  {qr.name}
+                </span>
               </div>
             </div>
-          </div>
 
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-            SafeReach
-          </h1>
-
-          <p className="text-red-600 font-semibold mt-2">{qr.name}</p>
-          <p className="text-gray-500 text-sm mt-1">Emergency Contact</p>
-
-          <div className="mt-10 px-4">
-          <h2 className="text-3xl font-bold text-gray-800 leading-tight">
-            {qr.headline}
-          </h2>
-
-            <p className="text-gray-500 mt-5 leading-relaxed">
+            <p className="text-[15px] font-normal leading-[22px] text-body">
               You can contact the owner through this secure anonymous chat.
             </p>
+
+            <PrivacyNote
+              tone="yellow"
+              icon={<MessageCircle size={16} strokeWidth={STROKE} />}
+            >
+              This owner allows {MAX_VISITOR_MESSAGES} messages per finder in
+              total. Your allowance never resets.
+            </PrivacyNote>
           </div>
 
-          <button
-            onClick={handleStartChat}
-            disabled={starting}
-            className="w-full mt-10 bg-red-600 text-white py-5 rounded-2xl font-bold text-xl shadow-lg shadow-red-200 hover:bg-red-700 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {starting ? (
-              <span className="flex items-center justify-center gap-3">
-                <span className="w-6 h-6 border-3 border-white/40 border-t-white rounded-full animate-spin" />
-                Connecting...
-              </span>
-            ) : (
-              'START CHAT'
+          <div className="flex flex-col gap-3.5 mt-8">
+            <PrimaryButton
+              onClick={handleStartChat}
+              disabled={starting}
+              icon={
+                starting ? (
+                  <Spinner className="border-ink/25 border-t-ink" />
+                ) : (
+                  <MessageCircle size={20} strokeWidth={STROKE} />
+                )
+              }
+            >
+              {starting ? 'Connecting…' : 'Start text chat'}
+            </PrimaryButton>
+
+            <p className="text-[12px] leading-[17px] text-body text-center">
+              Anonymous · Maximum {MAX_VISITOR_MESSAGES} messages · Chat expires
+              after 14 days
+            </p>
+
+            {error && (
+              <p className="text-[13px] leading-5 text-center text-amber">
+                {error}
+              </p>
             )}
-          </button>
-
-          <p className="text-xs text-gray-400 mt-5">
-            Anonymous • Maximum 10 messages • Chat expires after 14 days
-          </p>
-
-          {error && (
-            <p className="text-sm text-red-600 mt-4">{error}</p>
-          )}
+          </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
+  /* ---------------- Chat ---------------- */
   const limitReached = visitorMessageCount >= MAX_VISITOR_MESSAGES;
+  const remaining = Math.max(0, MAX_VISITOR_MESSAGES - visitorMessageCount);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="bg-red-600 text-white px-4 py-3 shadow-lg">
-        <div className="max-w-lg mx-auto flex items-center gap-3">
-          <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center">
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h8M12 8v8" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="font-semibold text-lg">{qr.name}</h1>
-            <p className="text-red-100 text-sm">SafeReach Emergency Chat</p>
-          </div>
-          <div className="ml-auto flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-sm text-red-100">Live</span>
-          </div>
+    <AppShell className="h-screen overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-6 h-[72px] shrink-0">
+        <div className="w-10 h-10 rounded-[14px] bg-accent-soft flex items-center justify-center shrink-0">
+          <User size={22} strokeWidth={STROKE} className="text-ink" />
         </div>
+        <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+          <h1 className="text-[17px] font-semibold leading-[21px] text-ink truncate">
+            {qr.name}
+          </h1>
+          <p className="text-[11px] font-normal leading-[13px] text-muted truncate">
+            Private text chat · No account needed
+          </p>
+        </div>
+        <span className="flex items-center gap-1.5 shrink-0">
+          <span className="w-2 h-2 rounded-full bg-accent animate-pulse-soft" />
+          <span className="text-[11px] font-medium leading-4 text-muted">Live</span>
+        </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-lg mx-auto space-y-3">
-          {messages.map((msg) => (
-            <div key={msg.id} className={msg.sender === 'user' ? 'flex justify-end' : 'flex justify-start'}>
-              <div className={msg.sender === 'user'
-                ? 'max-w-[80%] px-4 py-2 rounded-2xl bg-red-600 text-white rounded-br-md'
-                : 'max-w-[80%] px-4 py-2 rounded-2xl bg-white text-gray-800 shadow-md rounded-bl-md'}>
-                <p className="text-sm leading-relaxed">{msg.text}</p>
-                <p className={msg.sender === 'user'
-                  ? 'text-xs mt-1 text-red-200'
-                  : 'text-xs mt-1 text-gray-400'}>
-                  {new Date(msg.timestamp).toLocaleTimeString([], {
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-6 pt-2.5">
+        <div className="flex flex-col gap-4 pb-4">
+          {/* Allowance */}
+          <div className="rounded-control bg-accent-soft p-3.5 flex flex-col gap-[9px]">
+            <div className="flex items-center justify-between">
+              <p className="text-[13px] font-semibold leading-4 text-ink">
+                {visitorMessageCount} of {MAX_VISITOR_MESSAGES} messages sent
+              </p>
+              <p className="text-[12px] font-semibold leading-[15px] text-amber">
+                {remaining} left
+              </p>
+            </div>
+            <ProgressBar value={visitorMessageCount} max={MAX_VISITOR_MESSAGES} />
+            <p className="text-[11px] font-normal leading-4 text-amber">
+              One allowance per owner. It never resets, even after another scan.
+            </p>
+          </div>
+
+          {messages.length > 0 && (
+            <p className="text-[11px] leading-4 text-muted text-center">
+              View earlier messages
+            </p>
+          )}
+
+          <div className="flex flex-col gap-3.5">
+            {messages.map((msg, index) => {
+              const mine = msg.sender === 'user';
+              const userIndex = messages
+                .slice(0, index + 1)
+                .filter((m) => m.sender === 'user').length;
+              return (
+                <MessageBubble
+                  key={msg.id}
+                  side={mine ? 'me' : 'them'}
+                  text={msg.text}
+                  time={new Date(msg.timestamp).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
                   })}
-                </p>
-              </div>
-            </div>
-          ))}
+                  meta={
+                    mine && userIndex === visitorMessageCount
+                      ? `Message ${userIndex} of ${MAX_VISITOR_MESSAGES}`
+                      : undefined
+                  }
+                />
+              );
+            })}
+          </div>
+
+          {limitReached && <LimitCard limit={MAX_VISITOR_MESSAGES} />}
+
           <div ref={messagesEndRef} />
         </div>
       </div>
 
-      {error && (
-        <div className="px-4 pb-2">
-          <div className="max-w-lg mx-auto text-center text-sm text-red-600">
-            {error}
-          </div>
-        </div>
-      )}
-
-      <div className="bg-white border-t px-4 py-3 shadow-inner">
-        <div className="max-w-lg mx-auto">
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
+      {/* Reply controls */}
+      <div className="shrink-0 px-6 pb-6 pt-3 bg-white">
+        {!limitReached ? (
+          <>
+            <p className="text-[12px] font-semibold leading-[17px] text-amber mb-3">
+              {remaining} message{remaining === 1 ? '' : 's'} left. Include any
+              final details.
+            </p>
+            <Composer
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={setInput}
+              onSend={handleSend}
               onKeyDown={handleKeyPress}
-              placeholder={limitReached ? '10-message limit reached' : 'Type your message...'}
-              disabled={limitReached}
-              className="flex-1 px-4 py-3 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 text-sm disabled:opacity-60"
             />
+            <p className="text-[11px] leading-4 text-body text-center mt-3">
+              Only anonymous text is shared.
+              <br />
+              The owner’s contact details stay private.
+            </p>
+          </>
+        ) : (
+          <>
+            <Composer locked placeholder="Message allowance used" />
+            <p className="text-[11px] leading-4 text-body text-center mt-3">
+              You can still read this chat and the owner’s replies.
+            </p>
+          </>
+        )}
 
-            <button
-              onClick={handleSend}
-              disabled={!input.trim() || limitReached}
-              className="w-11 h-11 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Send"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </button>
-          </div>
-
-          <div className="text-center text-xs text-gray-400 mt-2">
-            {MAX_VISITOR_MESSAGES - visitorMessageCount} message
-            {MAX_VISITOR_MESSAGES - visitorMessageCount !== 1 ? 's' : ''} remaining
-          </div>
-        </div>
+        {error && !limitReached && (
+          <p className="text-[13px] leading-5 text-center text-amber mt-3">
+            {error}
+          </p>
+        )}
       </div>
-    </div>
+    </AppShell>
   );
 };
+
+/* Small local QR icon (scan corners). */
+const QrIcon: React.FC = () => (
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 32 32"
+    fill="none"
+    className="text-ink"
+  >
+    <path
+      d="M11 11V9h3M18 9h3v2M21 23v-2h-3M14 21h-3v2M11 16h10"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
 export default ChatPage;
