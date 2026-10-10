@@ -1,0 +1,4 @@
+# Cloudflare Pages SPA fallback
+# Serve index.html for any path that does not match a static asset,
+# so client-side routes like /owner and /c/:ownerId/:qrId work.
+/*    /index.html   200

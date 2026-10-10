@@ -100,7 +100,7 @@ firebase deploy --only firestore:rules
 For scheduled cleanup:
 
 ```bash
-cd functions
+cd firebase-functions
 npm install
 cd ..
 firebase deploy --only functions:deleteExpiredChats
